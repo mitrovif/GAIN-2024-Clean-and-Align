@@ -1227,3 +1227,55 @@ message("✅ Updated `group_roster` has been saved to: ", analysis_ready_file)
 
 # Save updated version of "group_roster" back to the list
 final_version_data[["group_roster"]] <- group_roster
+# ======================================================
+# Step 34: Write and Clean PR012 roster for challenges and use of reccomendations
+# ======================================================
+# Load required libraries
+library(dplyr)
+library(readr)
+library(stringr)
+
+# File paths
+group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+repeat_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/05 Data Collection/Data Archive/Final Version/repeat_PRO11_PRO12.csv"
+output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_repeat_PRO11_PRO12.csv"
+
+# Load datasets
+group_roster <- read_csv(group_roster_file, show_col_types = FALSE)
+repeat_data <- read_csv(repeat_file, show_col_types = FALSE)
+
+# Ensure `_parent_index` is numeric in `repeat_data`
+repeat_data <- repeat_data %>%
+  mutate(across(c(`_parent_index`), as.numeric))
+
+# Join datasets to add additional columns from `group_roster`
+repeat_data <- repeat_data %>%
+  left_join(
+    group_roster %>%
+      select(index, morganization, mcountry, gPRO04, gPRO05, gLOC01, g_conled, region),
+    by = c("_parent_index" = "index")
+  )
+
+# Convert `PRO12` variables to numeric (0, 1, NA)
+pro12_columns <- grep("^PRO12", names(repeat_data), value = TRUE)
+repeat_data <- repeat_data %>%
+  mutate(across(all_of(pro12_columns), ~ as.numeric(.)))
+
+# Rename `PRO12` columns
+new_pro12_names <- c("PRO12", paste0("PRO12", LETTERS[1:(length(pro12_columns) - 1)]))
+names(repeat_data)[which(names(repeat_data) %in% pro12_columns)] <- new_pro12_names
+
+# Create a dictionary for labels using the uppercase text in the original names
+pro12_labels <- setNames(
+  str_extract(pro12_columns, "[A-Z\\s]+$"),
+  new_pro12_names
+)
+
+# Save the cleaned and updated dataset in the Analysis Ready Files folder
+write_csv(repeat_data, output_file)
+
+# Print labels for reference
+print(pro12_labels)
+
+# Confirm the file has been saved
+message("Updated file saved to: ", output_file)
