@@ -1106,7 +1106,32 @@ main_roster <- main_roster %>%
 # Step 5: Merge `gLOC01`, `morganization`, and `mcountry` from `main_roster`
 group_roster2 <- group_roster2 %>%
   left_join(main_roster %>% select(pindex2, LOC01, morganization, mcountry), by = "pindex2")
+# Ensure `region` column is created in `group_roster2`
+group_roster2 <- group_roster2 %>%
+  mutate(region = NA_character_)  # Create an empty `region` column
 
+# Assign regions to `group_roster2` dataset using `country_region_mapping`
+group_roster2 <- group_roster2 %>%
+  left_join(country_region_mapping, by = "mcountry") %>%
+  mutate(
+    region = coalesce(region.y, "Other")  # Use region from mapping, fill missing with "Other"
+  ) %>%
+  select(-region.y)  # Drop intermediate column from join
+# Create `q2025` based on the quarter variable
+# Identify the column that starts with "FPR07"
+column_name <- colnames(group_roster2)[startsWith(colnames(group_roster2), "FPR07")][1]
+
+# Use the identified column in mutate
+group_roster2 <- group_roster2 %>%
+  mutate(
+    q2025 = case_when(
+      grepl("Quarter 1", .data[[column_name]]) ~ 1,
+      grepl("Quarter 2", .data[[column_name]]) ~ 2,
+      grepl("Quarter 3", .data[[column_name]]) ~ 3,
+      grepl("Quarter 4", .data[[column_name]]) ~ 4,
+      TRUE ~ NA_real_
+    )
+  )
 # Save the final dataset
 write.csv(group_roster2, output_group_roster2_file, row.names = FALSE)
 message("Saved `analysis_ready_group_roster2.csv` with `pindex2`, `gLOC01`, `morganization`, and `mcountry`. File located at: ", output_group_roster2_file)
