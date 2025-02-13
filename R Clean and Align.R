@@ -1021,7 +1021,6 @@ country_region_mapping <- tibble::tribble(
   "United States", "North America",
   "Yemen", "Middle East",
   "Zambia", "Africa",
-  # Additional requested country-region mappings
   "Burundi", "Africa",
   "Bangladesh", "Asia",
   "Zimbabwe", "Africa",
