@@ -3,12 +3,13 @@ library(readxl)
 library(dplyr)
 library(countrycode)
 library(readr)
+
 # ======================================================
 # Step 0: Define file locations
 # ======================================================
+
 final_version_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/05 Data Collection/Data Archive/Final Version/EGRISS_GAIN_2024_Final_Version.xlsx"
 data_clean_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/06 Data Cleaning/EGRISS_GAIN_2024_-_Data Clean.xlsx"
-output_directory <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data"
 output_directory <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data"
 gain_survey_all_file <- file.path(output_directory, "GAIN Survey - All Data.xlsx")
 
@@ -19,9 +20,11 @@ analysis_ready_directory <- file.path(output_directory, "Analysis Ready Files")
 if (!dir.exists(analysis_ready_directory)) {
   dir.create(analysis_ready_directory, recursive = TRUE)
 }
+
 # ======================================================
 # Step 1: Import all sheets from both files
 # ======================================================
+
 final_version_sheets <- excel_sheets(final_version_file)
 data_clean_sheets <- excel_sheets(data_clean_file)
 
@@ -36,9 +39,11 @@ data_clean_data <- lapply(data_clean_sheets, function(sheet) {
   read_excel(data_clean_file, sheet = sheet)
 })
 names(data_clean_data) <- data_clean_sheets
+
 # ======================================================
 # Step 2: Rename `_PRO02A` to `PRO02` and `_index` to `index` in `group_roster`
 # ======================================================
+
 if ("group_roster" %in% names(final_version_data)) {
   group_roster <- final_version_data[["group_roster"]]
   
@@ -74,9 +79,11 @@ if ("EGRISS GAIN 2024" %in% names(final_version_data)) {
   # Save back to the list
   final_version_data[["EGRISS GAIN 2024"]] <- egriss_gain_2024
 }
+
 # ======================================================
 # Step 3: Remove entries in "EGRISS GAIN 2024" based on del_EGRISS GAIN
 # ======================================================
+
 if ("EGRISS GAIN 2024" %in% names(final_version_data) && "del_EGRISS GAIN" %in% names(data_clean_data)) {
   egriss_gain_2024 <- final_version_data[["EGRISS GAIN 2024"]]
   del_egriss_gain <- data_clean_data[["del_EGRISS GAIN"]]
@@ -89,10 +96,10 @@ if ("EGRISS GAIN 2024" %in% names(final_version_data) && "del_EGRISS GAIN" %in% 
   final_version_data[["EGRISS GAIN 2024"]] <- egriss_gain_2024
 }
 
-
 # ======================================================
 # Step 4: Remove entries in "group_roster" based on del_group_roster
 # ======================================================
+
 if ("group_roster" %in% names(final_version_data) && "del_group_roster" %in% names(data_clean_data)) {
   group_roster <- final_version_data[["group_roster"]]
   del_group_roster <- data_clean_data[["del_group_roster"]]
@@ -104,9 +111,11 @@ if ("group_roster" %in% names(final_version_data) && "del_group_roster" %in% nam
   # Save cleaned version of "group_roster" back to the list
   final_version_data[["group_roster"]] <- group_roster
 }
+
 # ======================================================
 # Step 5: Add text values to `PRO02` in "group_roster"
 # ======================================================
+
 if ("group_roster" %in% names(final_version_data) && "title_PRO02" %in% names(data_clean_data)) {
   group_roster <- final_version_data[["group_roster"]]
   title_pro02 <- data_clean_data[["title_PRO02"]]
@@ -122,9 +131,11 @@ if ("group_roster" %in% names(final_version_data) && "title_PRO02" %in% names(da
   # Save updated version of "group_roster" back to the list
   final_version_data[["group_roster"]] <- group_roster
 }
+
 # ======================================================
 # Step 6: Add `year` column to both cleaned datasets
 # ======================================================
+
 if ("EGRISS GAIN 2024" %in% names(final_version_data)) {
   final_version_data[["EGRISS GAIN 2024"]] <- final_version_data[["EGRISS GAIN 2024"]] %>%
     mutate(year = 2024)
@@ -138,6 +149,7 @@ if ("group_roster" %in% names(final_version_data)) {
 # ======================================================
 # Step 7: Rename variables in "EGRISS GAIN 2024" using var_main (sequence-based)
 # ======================================================
+
 if ("var_main" %in% names(data_clean_data) && "EGRISS GAIN 2024" %in% names(final_version_data)) {
   var_main <- data_clean_data[["var_main"]]
   egriss_gain_2024 <- final_version_data[["EGRISS GAIN 2024"]]
@@ -154,9 +166,11 @@ if ("var_main" %in% names(data_clean_data) && "EGRISS GAIN 2024" %in% names(fina
   final_version_data[["EGRISS GAIN 2024"]] <- egriss_gain_2024
   message("Variables renamed in 'EGRISS GAIN 2024' based on sequence.")
 }
+
 # ======================================================
 # Step 8: Rename variables in "group_roster" using var_group (sequence-based)
 # ======================================================
+
 if ("var_group" %in% names(data_clean_data) && "group_roster" %in% names(final_version_data)) {
   var_group <- data_clean_data[["var_group"]]
   group_roster <- final_version_data[["group_roster"]]
@@ -197,9 +211,11 @@ analysis_ready_directory <- file.path(output_directory, "Analysis Ready Files")
 if (!dir.exists(analysis_ready_directory)) {
   dir.create(analysis_ready_directory, recursive = TRUE)
 }
+
 # ======================================================
 # Step 9: Load `GAIN Survey - All Data` file
 # ======================================================
+
 if (file.exists(gain_survey_all_file)) {
   gain_survey_sheets <- excel_sheets(gain_survey_all_file)
   
@@ -226,9 +242,11 @@ if ("_index" %in% colnames(main_roster)) {
   main_roster <- main_roster %>%
     rename(index = `_index`)
 }
+
 # ======================================================
 # Step 10: Merge `main_roster` with `renamed_EGRISS_GAIN_2024`
 # ======================================================
+
 if (exists("main_roster") && exists("final_version_data") && "EGRISS GAIN 2024" %in% names(final_version_data)) {
   # Align columns
   renamed_EGRISS_GAIN_2024 <- final_version_data[["EGRISS GAIN 2024"]]
@@ -265,9 +283,11 @@ if (exists("main_roster") && exists("final_version_data") && "EGRISS GAIN 2024" 
 } else {
   message("One or more datasets are missing for merging 'main_roster' with 'renamed_EGRISS_GAIN_2024'.")
 }
+
 # ======================================================
 # Step 11: Merge `group_roster_all` with `renamed_group_roster`
 # ======================================================
+
 if (exists("group_roster_all") && exists("final_version_data") && "group_roster" %in% names(final_version_data)) {
   # Ensure column names are valid and not NA
   colnames(group_roster_all) <- make.names(colnames(group_roster_all), unique = TRUE)
@@ -312,6 +332,7 @@ if (exists("group_roster_all") && exists("final_version_data") && "group_roster"
 # ======================================================
 # Step 12: Confirm saved files
 # ======================================================
+
 saved_files <- list.files(analysis_ready_directory, full.names = TRUE)
 if (length(saved_files) > 0) {
   message("Analysis-ready files have been saved:")
@@ -348,6 +369,7 @@ if (file.exists(analysis_ready_group_roster_file)) {
 # ======================================================
 # Step 13: Create `pindex2` - Combine `ryear` and `pindex1` into an 8-digit index
 # ======================================================
+
 # Ensure `pindex1` exists by extracting from `X_parent_index`
 if (!"pindex1" %in% colnames(group_roster) & "X_parent_index" %in% colnames(group_roster)) {
   group_roster <- group_roster %>%
@@ -570,6 +592,7 @@ group_roster <- group_roster %>%
 # Save the updated dataset under the same name
 write.csv(group_roster, group_roster_file, row.names = FALSE)
 message("Recode of `PRO03B` completed. All values are now numeric. Updated file saved to `analysis_ready_group_roster.csv`.")
+
 # ======================================================
 # Step 17: Standardizes `PRO03D` in `analysis_ready_group_roster` to numeric values:
 # 1 = NATIONAL, 2 = INSTITUTIONAL, 8 = DON'T KNOW.
@@ -624,7 +647,6 @@ group_roster <- group_roster %>%
 # Save the updated dataset under the same name
 write.csv(group_roster, group_roster_file, row.names = FALSE)
 message("Recode of `PRO06` completed. All values are now numeric. Updated file saved to `analysis_ready_group_roster.csv`.")
-
 
 # ======================================================
 # Step 19: Standardizes `PRO09` in `analysis_ready_group_roster` to numeric values:
@@ -726,6 +748,7 @@ group_roster <- group_roster %>%
 # Save the updated dataset under the same name
 write.csv(group_roster, group_roster_file, row.names = FALSE)
 message("Recode of `PRO17` completed. All values are now numeric. Updated file saved to `analysis_ready_group_roster.csv`.")
+
 # ======================================================
 # Step 23: Standardizes `PRO04` to extract proper years or retain original valid values.
 # Special handling for UNIX timestamps including `662688000`, `788918400`, and `-694310400`.
@@ -886,7 +909,6 @@ message("Created `g_conled` in `analysis_ready_group_roster.csv` based on `gLOC0
 # It only updates entries where 'mcountry' is NA and 'PRO03C' contains an ISO code,
 # ensuring all updates are relevant to country-led examples.
 # ======================================================
-
 
 # File path
 group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
@@ -1057,6 +1079,7 @@ message("Updated `region` variable in `analysis_ready_group_roster.csv`. Saved t
 # The region column is added or updated to ensure consistency in geographic classifications.
 # The cleaned dataset is then saved in the Analysis Ready Files folder.
 # ======================================================
+
 # Load necessary libraries
 library(dplyr)
 library(readr)
@@ -1168,6 +1191,7 @@ group_roster <- group_roster %>%
 # Save the updated dataset
 write_csv(group_roster, group_roster_file)
 message("Successfully updated `PRO02A` and `PRO03` based on `ryear` conditions (Step 32).")
+
 # ======================================================
 # Step 33: Overwrite `group_roster` Values Using JDC Data
 # - Matches rows where `pindex2` & `X_index` are identical.
@@ -1216,7 +1240,19 @@ group_roster <- group_roster %>%
   )) %>%
   select(-ends_with(".y")) %>%
   # Rename columns to remove .x (lowercase only)
-  rename_with(~ gsub("\\.x$", "", .), ends_with(".x"))
+  rename_with(~ gsub("\\.x$", "", .), ends_with(".x")) %>%
+  mutate(region = case_when(
+    mcountry == "Sudan" ~ "Africa",
+    mcountry == "Burundi" ~ "Africa",
+    mcountry == "Central African Republic" ~ "Africa",
+    mcountry == "Iraq" ~ "Middle East",
+    mcountry == "Turkiye" ~ "Asia",
+    mcountry == "Bangladesh" ~ "Asia",
+    mcountry == "Zimbabwe" ~ "Africa",
+    mcountry == "Mauritania" ~ "Africa",
+    mcountry == "Mozambique" ~ "Africa",
+    mcountry == "Malawi" ~ "Africa",
+    TRUE ~ region))
 
 
 # Save updated version to "analysis_ready_group_roster.csv"
@@ -1227,9 +1263,11 @@ message("✅ Updated `group_roster` has been saved to: ", analysis_ready_file)
 
 # Save updated version of "group_roster" back to the list
 final_version_data[["group_roster"]] <- group_roster
+
 # ======================================================
 # Step 34: Write and Clean PR012 roster for challenges and use of reccomendations
 # ======================================================
+
 # Load required libraries
 library(dplyr)
 library(readr)
@@ -1279,3 +1317,34 @@ print(pro12_labels)
 
 # Confirm the file has been saved
 message("Updated file saved to: ", output_file)
+# ======================================================
+# Step 35: Write and Clean GRF repeat pledge file
+# ======================================================
+# Load necessary libraries
+library(dplyr)
+library(readr)
+library(openxlsx)
+
+# File paths
+repeat_pledges_path <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/05 Data Collection/Data Archive/Final Version/repeat_pledges.csv"
+main_roster_path <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
+output_path <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/repeat_pledges_cleaned.csv"
+
+# Load datasets
+repeat_pledges <- read_csv(repeat_pledges_path)
+main_roster <- read_csv(main_roster_path)
+
+# Merge repeat_pledges with main_roster to add mcountry, morganization, and LOC01
+repeat_pledges_cleaned <- repeat_pledges %>%
+  left_join(main_roster %>% select(index, mcountry, morganization, LOC01), 
+            by = c("_parent_index" = "index"))
+
+# Rename column
+colnames(repeat_pledges_cleaned)[colnames(repeat_pledges_cleaned) == 
+                                   "GRF04. What is the current status of the pledge implementation for pledge: **${pledge_name}?**"] <- "GRF04"
+
+# Save cleaned dataset as CSV
+write_csv(repeat_pledges_cleaned, output_path)
+
+# Print success message
+cat("The repeat_pledges dataset has been cleaned and saved as 'repeat_pledges_cleaned.csv'.\n")
