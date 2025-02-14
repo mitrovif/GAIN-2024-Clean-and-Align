@@ -1221,7 +1221,7 @@ group_roster <- group_roster %>%
 #   filter(pindex2==20240115)
 
 group_roster <- group_roster %>%
-  left_join(jdc, by = c("pindex2", "index" = "X_index"))
+  left_join(jdc, by = c( "index" = "_index"))
 
 group_roster <- group_roster %>%
   # Loop through columns ending with .x (lowercase)
