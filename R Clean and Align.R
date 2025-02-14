@@ -1278,3 +1278,34 @@ print(pro12_labels)
 
 # Confirm the file has been saved
 message("Updated file saved to: ", output_file)
+# ======================================================
+# Step 35: Write and Clean GRF repeat pledge file
+# ======================================================
+# Load necessary libraries
+library(dplyr)
+library(readr)
+library(openxlsx)
+
+# File paths
+repeat_pledges_path <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/05 Data Collection/Data Archive/Final Version/repeat_pledges.csv"
+main_roster_path <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
+output_path <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/repeat_pledges_cleaned.csv"
+
+# Load datasets
+repeat_pledges <- read_csv(repeat_pledges_path)
+main_roster <- read_csv(main_roster_path)
+
+# Merge repeat_pledges with main_roster to add mcountry, morganization, and LOC01
+repeat_pledges_cleaned <- repeat_pledges %>%
+  left_join(main_roster %>% select(index, mcountry, morganization, LOC01), 
+            by = c("_parent_index" = "index"))
+
+# Rename column
+colnames(repeat_pledges_cleaned)[colnames(repeat_pledges_cleaned) == 
+                                   "GRF04. What is the current status of the pledge implementation for pledge: **${pledge_name}?**"] <- "GRF04"
+
+# Save cleaned dataset as CSV
+write_csv(repeat_pledges_cleaned, output_path)
+
+# Print success message
+cat("The repeat_pledges dataset has been cleaned and saved as 'repeat_pledges_cleaned.csv'.\n")
