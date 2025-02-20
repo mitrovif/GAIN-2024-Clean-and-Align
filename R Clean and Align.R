@@ -1348,3 +1348,38 @@ write_csv(repeat_pledges_cleaned, output_path)
 
 # Print success message
 cat("The repeat_pledges dataset has been cleaned and saved as 'repeat_pledges_cleaned.csv'.\n")
+# ======================================================
+# Step 35: Data Cleaning: Merge Unique PRO18 Variables into Analysis Ready Group Roster
+# ======================================================
+
+# Load necessary libraries
+library(dplyr)
+library(readr)
+
+# File paths
+partners_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/06 Data Cleaning/analysis_ready_group_roster_partners.csv"
+roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+
+# Load datasets
+partners_data <- read_csv(partners_file)
+roster_data <- read_csv(roster_file)
+
+# Ensure all relevant columns are numeric
+partners_data <- partners_data %>%
+  mutate(across(c(PRO18.A, PRO18.B, PRO18.C), as.numeric))
+
+# Keep only unique matches based on identical pindex1 & pindex2
+partners_data_unique <- partners_data %>%
+  distinct(pindex1, pindex2, .keep_all = TRUE)  # Remove duplicates
+
+# Merge only exact matches
+updated_roster <- roster_data %>%
+  inner_join(partners_data_unique %>% select(pindex1, pindex2, PRO18.A, PRO18.B, PRO18.C), 
+             by = c("pindex1", "pindex2"))
+
+# Save the updated dataset
+write_csv(updated_roster, output_file)
+
+# Print success message
+cat("The updated analysis_ready_group_roster has been saved as 'analysis_ready_group_roster_partner.csv'.\n")
