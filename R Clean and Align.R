@@ -1252,8 +1252,10 @@ group_roster <- group_roster %>%
     mcountry == "Mauritania" ~ "Africa",
     mcountry == "Mozambique" ~ "Africa",
     mcountry == "Malawi" ~ "Africa",
+    TRUE ~ region)) %>%
+  mutate(region = case_when(
+    region == "Oceania" ~ "Asia",
     TRUE ~ region))
-
 
 # Save updated version to "analysis_ready_group_roster.csv"
 analysis_ready_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
