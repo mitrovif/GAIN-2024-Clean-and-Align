@@ -247,42 +247,84 @@ if ("_index" %in% colnames(main_roster)) {
 # Step 10: Merge `main_roster` with `renamed_EGRISS_GAIN_2024`
 # ======================================================
 
-if (exists("main_roster") && exists("final_version_data") && "EGRISS GAIN 2024" %in% names(final_version_data)) {
-  # Align columns
-  renamed_EGRISS_GAIN_2024 <- final_version_data[["EGRISS GAIN 2024"]]
-  all_columns_main <- union(colnames(renamed_EGRISS_GAIN_2024), colnames(main_roster))
+renamed_EGRISS_GAIN_2024 <- read.csv(file.path(output_directory, "renamed_EGRISS_GAIN_2024.csv"))
+
+align_column_types <- function(df1, df2) {
+  # Get the column names for both dataframes
+  colnames_df1 <- colnames(df1)
+  colnames_df2 <- colnames(df2)
   
-  # Add missing columns with NA to both datasets
-  for (col in setdiff(all_columns_main, colnames(main_roster))) {
-    main_roster[[col]] <- NA
+  # Find the common column names between the two dataframes
+  common_cols <- intersect(colnames_df1, colnames_df2)
+  
+  # Loop through the common columns and align their types
+  for (col in common_cols) {
+    # Check the types of the first element in both columns
+    class_df1 <- class(df1[[col]])[1]  # Take the first element's class
+    class_df2 <- class(df2[[col]])[1]  # Take the first element's class
+    
+    # If one of the columns is a Date or POSIXct, convert both columns to character
+    if ("POSIXct" %in% c(class_df1, class_df2)) {
+      # Convert both columns to character if one is POSIXct
+      df1[[col]] <- as.character(df1[[col]])
+      df2[[col]] <- as.character(df2[[col]])
+    } else if ("Date" %in% c(class_df1, class_df2)) {
+      # Convert both columns to character if one is Date
+      df1[[col]] <- as.character(df1[[col]])
+      df2[[col]] <- as.character(df2[[col]])
+    } else {
+      # For non-date types, match the type (prefer character if one column is character)
+      if (class_df1 != class_df2) {
+        if (class_df1 == "character" || class_df2 == "character") {
+          # Convert both columns to character if either is character
+          df1[[col]] <- as.character(df1[[col]])
+          df2[[col]] <- as.character(df2[[col]])
+        } else {
+          # If one column is numeric, convert both columns to numeric
+          df1[[col]] <- as.numeric(df1[[col]])
+          df2[[col]] <- as.numeric(df2[[col]])
+        }
+      }
+    }
   }
-  for (col in setdiff(all_columns_main, colnames(renamed_EGRISS_GAIN_2024))) {
-    renamed_EGRISS_GAIN_2024[[col]] <- NA
-  }
   
-  # Align column types
-  aligned_data <- align_column_types(renamed_EGRISS_GAIN_2024, main_roster)
-  renamed_EGRISS_GAIN_2024 <- aligned_data$df1
-  main_roster <- aligned_data$df2
-  
-  # Merge datasets
-  merged_main <- bind_rows(renamed_EGRISS_GAIN_2024, main_roster)
-  
-  # Ensure `index` exists before arranging
-  if ("index" %in% colnames(merged_main)) {
-    merged_main <- merged_main %>%
-      arrange(index)
-  } else {
-    message("`index` column not found in merged_main. Skipping `arrange()`.")
-  }
-  
-  # Save merged dataset
-  output_main_roster <- file.path(analysis_ready_directory, "analysis_ready_main_roster.csv")
-  write.csv(merged_main, output_main_roster, row.names = FALSE)
-  message("Merged and saved main roster as analysis-ready dataset at: ", output_main_roster)
-} else {
-  message("One or more datasets are missing for merging 'main_roster' with 'renamed_EGRISS_GAIN_2024'.")
+  # Return the aligned dataframes as a list
+  return(list(df1 = df1, df2 = df2))
 }
+
+# Explicitly convert _submission_time to character before alignment
+renamed_EGRISS_GAIN_2024$`_submission_time` <- as.character(renamed_EGRISS_GAIN_2024$`_submission_time`)
+main_roster$`_submission_time` <- as.character(main_roster$`_submission_time`)
+
+# Align column types
+aligned_data <- align_column_types(renamed_EGRISS_GAIN_2024, main_roster)
+renamed_EGRISS_GAIN_2024 <- aligned_data$df1 
+main_roster <- aligned_data$df2
+
+# Check the class of the _submission_time column after the alignment
+cat("After alignment:\n")
+cat("renamed_EGRISS_GAIN_2024$_submission_time class:", class(renamed_EGRISS_GAIN_2024$`_submission_time`), "\n")
+cat("main_roster$_submission_time class:", class(main_roster$`_submission_time`), "\n")
+
+# Remove the 'X' prefix from column names that start with 'X'
+colnames(renamed_EGRISS_GAIN_2024) <- gsub("^X", "", colnames(renamed_EGRISS_GAIN_2024))
+
+# Merge datasets
+merged_main <- bind_rows(renamed_EGRISS_GAIN_2024, main_roster)
+
+# Ensure `index` exists before arranging
+if ("index" %in% colnames(merged_main)) {
+  merged_main <- merged_main %>%
+    arrange(index)
+} else {
+  message("`index` column not found in merged_main. Skipping `arrange()`.")
+}
+
+# Save merged dataset
+output_main_roster <- file.path(analysis_ready_directory, "analysis_ready_main_roster.csv")
+write.csv(merged_main, output_main_roster, row.names = FALSE)
+
+message("Merged and saved main roster as analysis-ready dataset at: ", output_main_roster)
 
 # ======================================================
 # Step 11: Merge `group_roster_all` with `renamed_group_roster`
