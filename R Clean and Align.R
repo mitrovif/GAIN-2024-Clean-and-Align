@@ -247,8 +247,6 @@ if ("_index" %in% colnames(main_roster)) {
 # Step 10: Merge `main_roster` with `renamed_EGRISS_GAIN_2024`
 # ======================================================
 
-renamed_EGRISS_GAIN_2024 <- read.csv(file.path(output_directory, "renamed_EGRISS_GAIN_2024.csv"))
-
 align_column_types <- function(df1, df2) {
   # Get the column names for both dataframes
   colnames_df1 <- colnames(df1)
@@ -292,6 +290,9 @@ align_column_types <- function(df1, df2) {
   return(list(df1 = df1, df2 = df2))
 }
 
+# Remove the 'X' prefix from column names that start with 'X'
+colnames(renamed_EGRISS_GAIN_2024) <- gsub("^X", "", colnames(renamed_EGRISS_GAIN_2024))
+
 # Explicitly convert _submission_time to character before alignment
 renamed_EGRISS_GAIN_2024$`_submission_time` <- as.character(renamed_EGRISS_GAIN_2024$`_submission_time`)
 main_roster$`_submission_time` <- as.character(main_roster$`_submission_time`)
@@ -300,14 +301,6 @@ main_roster$`_submission_time` <- as.character(main_roster$`_submission_time`)
 aligned_data <- align_column_types(renamed_EGRISS_GAIN_2024, main_roster)
 renamed_EGRISS_GAIN_2024 <- aligned_data$df1 
 main_roster <- aligned_data$df2
-
-# Check the class of the _submission_time column after the alignment
-cat("After alignment:\n")
-cat("renamed_EGRISS_GAIN_2024$_submission_time class:", class(renamed_EGRISS_GAIN_2024$`_submission_time`), "\n")
-cat("main_roster$_submission_time class:", class(main_roster$`_submission_time`), "\n")
-
-# Remove the 'X' prefix from column names that start with 'X'
-colnames(renamed_EGRISS_GAIN_2024) <- gsub("^X", "", colnames(renamed_EGRISS_GAIN_2024))
 
 # Merge datasets
 merged_main <- bind_rows(renamed_EGRISS_GAIN_2024, main_roster)
