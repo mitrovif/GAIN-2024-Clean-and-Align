@@ -8,9 +8,11 @@ library(readr)
 # Step 0: Define file locations
 # ======================================================
 
-final_version_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/05 Data Collection/Data Archive/Final Version/EGRISS_GAIN_2024_Final_Version.xlsx"
-data_clean_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/06 Data Cleaning/EGRISS_GAIN_2024_-_Data Clean.xlsx"
-output_directory <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data"
+setwd("C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024")
+
+final_version_file <- "05 Data Collection/Data Archive/Final Version/EGRISS_GAIN_2024_Final_Version.xlsx"
+data_clean_file <- "06 Data Cleaning/EGRISS_GAIN_2024_-_Data Clean.xlsx"
+output_directory <- "10 Data"
 gain_survey_all_file <- file.path(output_directory, "GAIN Survey - All Data.xlsx")
 
 # Define subfolder for analysis-ready files
@@ -201,7 +203,7 @@ message("Cleaned and renamed datasets have been saved to: ", output_directory)
 
 
 # Define file locations
-output_directory <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data"
+output_directory <- "10 Data"
 gain_survey_all_file <- file.path(output_directory, "GAIN Survey - All Data.xlsx")
 
 # Define subfolder for analysis-ready files
@@ -342,7 +344,7 @@ if (length(saved_files) > 0) {
 }
 
 # Load the analysis-ready group roster file
-analysis_ready_group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+analysis_ready_group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 if (file.exists(analysis_ready_group_roster_file)) {
   # Load the dataset
@@ -399,7 +401,7 @@ if ("pindex1" %in% colnames(group_roster) & "ryear" %in% colnames(group_roster))
 
 
 # Load the analysis-ready main roster file
-analysis_ready_main_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
+analysis_ready_main_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
 
 if (file.exists(analysis_ready_main_roster_file)) {
   # Load the dataset
@@ -432,7 +434,7 @@ if (file.exists(analysis_ready_main_roster_file)) {
 
 
 # Load the analysis-ready main roster file
-analysis_ready_main_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
+analysis_ready_main_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
 
 if (file.exists(analysis_ready_main_roster_file)) {
   # Load the dataset
@@ -463,7 +465,7 @@ if (file.exists(analysis_ready_main_roster_file)) {
 }
 
 # Load the analysis-ready main roster file
-analysis_ready_main_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
+analysis_ready_main_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
 
 # Load the dataset
 main_roster <- read.csv(analysis_ready_main_roster_file)
@@ -482,7 +484,7 @@ message("Removed rows where `INT02` is 'No'. Preserved rows with `NA`. Updated f
 # ======================================================
 
 # Load the analysis-ready main roster file
-analysis_ready_main_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
+analysis_ready_main_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
 
 # Load the dataset
 main_roster <- read.csv(analysis_ready_main_roster_file)
@@ -517,7 +519,7 @@ message("Recode of `LOC01` and capitalization of `organization` completed. Updat
 # ======================================================
 
 # Load the analysis-ready main roster file
-analysis_ready_main_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
+analysis_ready_main_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
 
 # Load the dataset
 main_roster <- read.csv(analysis_ready_main_roster_file)
@@ -544,8 +546,8 @@ message("Standardized `LOC04` to numeric values (1, 2, or 6). Updated file saved
 # ======================================================
 
 # File paths
-main_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+main_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the datasets
 main_roster <- read.csv(main_roster_file)
@@ -572,7 +574,7 @@ message("Added `morganization` and `mcountry` to `analysis_ready_group_roster.cs
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -599,7 +601,7 @@ message("Recode of `PRO03B` completed. All values are now numeric. Updated file 
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -626,7 +628,7 @@ message("Recode of `PRO03D` completed. All values are now numeric. Updated file 
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -654,7 +656,7 @@ message("Recode of `PRO06` completed. All values are now numeric. Updated file s
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -680,7 +682,7 @@ message("Recode of `PRO09` completed. All values are now numeric. Updated file s
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -705,7 +707,7 @@ message("Recode of `PRO14` completed. All values are now numeric. Updated file s
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -730,7 +732,7 @@ message("Recode of `PRO15` completed. All values are now numeric. Updated file s
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -756,7 +758,7 @@ message("Recode of `PRO17` completed. All values are now numeric. Updated file s
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -804,7 +806,7 @@ tryCatch({
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -854,8 +856,8 @@ tryCatch({
 # ======================================================
 
 # File paths
-main_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+main_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load datasets
 main_roster <- read.csv(main_roster_file)
@@ -879,7 +881,7 @@ message("Copied `LOC01` to `gLOC01` in `analysis_ready_group_roster.csv` based o
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -911,7 +913,7 @@ message("Created `g_conled` in `analysis_ready_group_roster.csv` based on `gLOC0
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read.csv(group_roster_file)
@@ -962,7 +964,7 @@ library(dplyr)
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load the dataset
 group_roster <- read_csv(group_roster_file, show_col_types = FALSE)
@@ -1085,8 +1087,8 @@ library(dplyr)
 library(readr)
 
 # Define file paths
-final_version_directory <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/05 Data Collection/Data Archive/Final Version"
-analysis_ready_directory <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files"
+final_version_directory <- "05 Data Collection/Data Archive/Final Version"
+analysis_ready_directory <- "10 Data/Analysis Ready Files"
 
 # File paths
 group_roster2_file <- file.path(final_version_directory, "group_roster2.csv")
@@ -1168,7 +1170,7 @@ message("Saved `analysis_ready_group_roster2.csv` with `pindex2`, `gLOC01`, `mor
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load dataset
 group_roster <- read_csv(group_roster_file, show_col_types = FALSE)
@@ -1200,11 +1202,11 @@ message("Successfully updated `PRO02A` and `PRO03` based on `ryear` conditions (
 # ======================================================
 
 # File path
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load datasets
 group_roster <- read_csv(group_roster_file, show_col_types = FALSE)
-jdc <- read_csv("C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/06 Data Cleaning/Data Clean_JDC.csv", show_col_types = FALSE)
+jdc <- read_csv("06 Data Cleaning/Data Clean_JDC.csv", show_col_types = FALSE)
 
 group_roster <- group_roster %>%
   rename_with(~ gsub("^X_", "", .), starts_with("X_"))
@@ -1271,7 +1273,7 @@ group_roster <- group_roster %>%
   )
 
 # Save updated version to "analysis_ready_group_roster.csv"
-analysis_ready_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+analysis_ready_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 write_csv(group_roster, analysis_ready_file)
 
 message("✅ Updated `group_roster` has been saved to: ", analysis_ready_file)
@@ -1289,9 +1291,9 @@ library(readr)
 library(stringr)
 
 # File paths
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
-repeat_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/05 Data Collection/Data Archive/Final Version/repeat_PRO11_PRO12.csv"
-output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_repeat_PRO11_PRO12.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+repeat_file <- "05 Data Collection/Data Archive/Final Version/repeat_PRO11_PRO12.csv"
+output_file <- "10 Data/Analysis Ready Files/analysis_ready_repeat_PRO11_PRO12.csv"
 
 # Load datasets
 group_roster <- read_csv(group_roster_file, show_col_types = FALSE)
@@ -1332,18 +1334,20 @@ print(pro12_labels)
 
 # Confirm the file has been saved
 message("Updated file saved to: ", output_file)
+
 # ======================================================
 # Step 35: Write and Clean GRF repeat pledge file
 # ======================================================
+
 # Load necessary libraries
 library(dplyr)
 library(readr)
 library(openxlsx)
 
 # File paths
-repeat_pledges_path <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/05 Data Collection/Data Archive/Final Version/repeat_pledges.csv"
-main_roster_path <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
-output_path <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/repeat_pledges_cleaned.csv"
+repeat_pledges_path <- "05 Data Collection/Data Archive/Final Version/repeat_pledges.csv"
+main_roster_path <- "10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
+output_path <- "10 Data/Analysis Ready Files/repeat_pledges_cleaned.csv"
 
 # Load datasets
 repeat_pledges <- read_csv(repeat_pledges_path)
@@ -1363,8 +1367,9 @@ write_csv(repeat_pledges_cleaned, output_path)
 
 # Print success message
 cat("The repeat_pledges dataset has been cleaned and saved as 'repeat_pledges_cleaned.csv'.\n")
+
 # ======================================================
-# Step 35: Data Cleaning: Merge Unique PRO18 Variables into Analysis Ready Group Roster
+# Step 36: Data Cleaning: Merge Unique PRO18 Variables into Analysis Ready Group Roster
 # ======================================================
 
 # Load necessary libraries
@@ -1372,9 +1377,9 @@ library(dplyr)
 library(readr)
 
 # File paths
-partners_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/06 Data Cleaning/analysis_ready_group_roster_partners.csv"
-roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
-output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+partners_file <- "06 Data Cleaning/analysis_ready_group_roster_partners.csv"
+roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+output_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 
 # Load datasets
 partners_data <- read_csv(partners_file)
