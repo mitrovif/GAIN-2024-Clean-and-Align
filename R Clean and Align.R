@@ -1274,6 +1274,7 @@ group_roster <- group_roster %>%
     .names = "{.col}"  # Keep the same column name
   )) %>%
   select(-ends_with(".y")) %>%
+
   # Rename columns to remove .x (lowercase only)
   rename_with(~ gsub("\\.x$", "", .), ends_with(".x")) %>%
   mutate(region = case_when(
@@ -1288,7 +1289,21 @@ group_roster <- group_roster %>%
     mcountry == "Mozambique" ~ "Africa",
     mcountry == "Malawi" ~ "Africa",
     TRUE ~ region))
+# Step 4: Recalculate `g_conled` ONLY for `pindex2 == 20240115`
 
+group_roster <- group_roster %>%
+  mutate(g_conled = as.numeric(g_conled))
+
+group_roster <- group_roster %>%
+  mutate(
+    g_conled = case_when(
+      pindex2 == 20240115 & gLOC01 == 1 ~ 1,  # Country-led if `gLOC01` is 1
+      pindex2 == 20240115 & gLOC01 == 2 & PRO03D == 1 ~ 1,  # Country-led if `gLOC01` is 2 and `PRO03D` is 1
+      pindex2 == 20240115 & gLOC01 == 2 ~ 2,  # Institutional-led if `gLOC01` is 2 and `PRO03D` is not 1
+      pindex2 == 20240115 & gLOC01 == 3 ~ 3,  # Other if `gLOC01` is 3
+      TRUE ~ g_conled  # Keep existing values for other rows
+    )
+  )
 
 # Save updated version to "analysis_ready_group_roster.csv"
 analysis_ready_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
@@ -1383,3 +1398,57 @@ write_csv(repeat_pledges_cleaned, output_path)
 
 # Print success message
 cat("The repeat_pledges dataset has been cleaned and saved as 'repeat_pledges_cleaned.csv'.\n")
+# ======================================================
+# Step 35: Data Cleaning: Merge Unique PRO18 Variables into Analysis Ready Group Roster
+# ======================================================
+
+# Load necessary libraries
+library(dplyr)
+library(readr)
+
+# File paths
+partners_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/06 Data Cleaning/analysis_ready_group_roster_partners.csv"
+roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+
+# Load datasets
+partners_data <- read_csv(partners_file)
+roster_data <- read_csv(roster_file)
+
+# Ensure all relevant columns are numeric
+partners_data <- partners_data %>%
+  mutate(across(c(PRO18.A, PRO18.B, PRO18.C), as.numeric))
+
+# Keep only unique matches based on identical index & pindex2
+partners_data_unique <- partners_data %>%
+  distinct(index, pindex2, .keep_all = TRUE)  # Remove duplicates
+
+# Merge only exact matches
+updated_roster <- roster_data %>%
+  left_join(partners_data_unique %>% select(index, pindex2, PRO18.A, PRO18.B, PRO18.C), 
+            by = c("index", "pindex2"))
+
+# Resolve .x and .y suffixes by keeping the most complete data
+updated_roster <- updated_roster %>%
+  mutate(across(
+    .cols = ends_with(".x"),  # Apply to columns ending with .x
+    .fns = ~ {
+      y_col_name <- paste0(sub(".x$", "", cur_column()), ".y")
+      # Use .y column if it exists; otherwise, keep .x
+      if (y_col_name %in% colnames(updated_roster)) {
+        coalesce(as.character(.x), as.character(updated_roster[[y_col_name]]))
+      } else {
+        .x  # If .y column doesn't exist, keep .x column
+      }
+    },
+    .names = "{.col}"  # Retain original column names
+  )) %>%
+  # Drop all .y columns after merging
+  select(-ends_with(".y")) %>%
+  rename_with(~ sub(".x$", "", .), ends_with(".x"))  # Remove .x from column names
+
+# Save the updated dataset
+write_csv(updated_roster, output_file)
+
+# Print success message
+cat("The updated analysis_ready_group_roster has been saved as 'analysis_ready_group_roster.csv'.\n")
