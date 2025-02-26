@@ -1364,7 +1364,7 @@ write_csv(repeat_pledges_cleaned, output_path)
 # Print success message
 cat("The repeat_pledges dataset has been cleaned and saved as 'repeat_pledges_cleaned.csv'.\n")
 # ======================================================
-# Step 35: Data Cleaning: Merge Unique PRO18 Variables into Analysis Ready Group Roster
+# Step 36: Data Cleaning: Merge Unique PRO18 Variables into Analysis Ready Group Roster
 # ======================================================
 
 # Load necessary libraries
@@ -1417,3 +1417,86 @@ write_csv(updated_roster, output_file)
 
 # Print success message
 cat("The updated analysis_ready_group_roster has been saved as 'analysis_ready_group_roster.csv'.\n")
+
+# ======================================================
+# Step 37: Identify & Remove Complete Duplicate Rows in `group_roster` for 2024
+# + Lists index numbers and requested values before cleaning
+# + Keeps other years unchanged
+# + Saves cleaned version as `analysis_ready_group_roster_v2.csv`
+# ======================================================
+
+# Load necessary libraries
+library(dplyr)
+library(readr)
+
+# File paths
+group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+group_roster_v2_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster_v2.csv"
+duplicate_entries_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/duplicate_entries_2024.csv"
+
+# Load dataset
+group_roster <- read_csv(group_roster_file, show_col_types = FALSE)
+
+# Step 1: Identify duplicate rows for 2024
+group_roster_2024 <- group_roster %>% filter(ryear == 2024)
+
+# Find complete duplicates (all column values are identical)
+duplicates_2024 <- group_roster_2024 %>%
+  group_by(across(everything())) %>%
+  filter(n() > 1) %>%
+  ungroup()
+
+# Extract requested values for duplicate rows
+duplicate_entries <- duplicates_2024 %>%
+  select(submission__id, submission__submission_time, morganization, PRO02A, mcountry, ryear, index, parent_index) %>%
+  distinct()
+
+# Save duplicate entries before cleaning
+write_csv(duplicate_entries, duplicate_entries_file)
+
+message("📌 Duplicate entries for 2024 saved in `duplicate_entries_2024.csv`.")
+
+# Step 2: Remove complete duplicate rows only for 2024
+group_roster_2024_cleaned <- group_roster_2024 %>% distinct()
+
+# Preserve data from other years
+group_roster_other <- group_roster %>% filter(ryear != 2024)
+
+# Combine cleaned 2024 data with other years
+group_roster_final <- bind_rows(group_roster_2024_cleaned, group_roster_other)
+
+# Save cleaned dataset as a new version
+write_csv(group_roster_final, group_roster_v2_file)
+
+message("✅ Removed all complete duplicates from `group_roster` for 2024 and saved as `analysis_ready_group_roster_v2.csv`.")
+# ======================================================
+# Step 38: Backup Analysis Ready Files with a Timestamp
+# ======================================================
+
+# Load necessary libraries
+library(fs)  # For file operations
+library(lubridate)  # For timestamp generation
+library(stringr)  # For string manipulation
+
+# Define the base directory for analysis-ready files
+analysis_ready_directory <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files"
+
+# Define the backup folder with timestamp
+timestamp <- format(Sys.time(), "%Y-%m-%d_%H-%M-%S")  # Generate timestamp
+backup_directory <- file.path(analysis_ready_directory, paste0("Backup_", timestamp))
+
+# Ensure the backup directory exists
+dir_create(backup_directory)
+message("✅ Backup folder created: ", backup_directory)
+
+# List all analysis-ready files (excluding previous backups)
+analysis_files <- dir_ls(analysis_ready_directory, type = "file")
+analysis_files <- analysis_files[!str_detect(analysis_files, "Backup_")]
+
+# Copy each file to the backup folder
+file_copy(analysis_files, backup_directory, overwrite = TRUE)
+
+# List and print the backed-up files
+backup_files <- dir_ls(backup_directory, type = "file")
+message("📂 Backup Completed. Files in the backup folder:")
+print(backup_files)
