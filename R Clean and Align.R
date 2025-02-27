@@ -1422,17 +1422,21 @@ cat("The updated analysis_ready_group_roster has been saved as 'analysis_ready_g
 # Step 37: Identify & Remove Complete Duplicate Rows in `group_roster` for 2024
 # + Lists index numbers and requested values before cleaning
 # + Keeps other years unchanged
-# + Saves cleaned version as `analysis_ready_group_roster_v2.csv`
+# + Saves the cleaned version back to `analysis_ready_group_roster.csv`
+# + Removes specific rows based on the `index` column from `del_group_roster_37`
 # ======================================================
 
 # Load necessary libraries
 library(dplyr)
 library(readr)
+library(readxl)
 
 # File paths
 group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
-group_roster_v2_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster_v2.csv"
 duplicate_entries_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/duplicate_entries_2024.csv"
+
+# File path for the data cleaning Excel file
+data_clean_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/06 Data Cleaning/EGRISS_GAIN_2024_-_Data Clean.xlsx"
 
 # Load dataset
 group_roster <- read_csv(group_roster_file, show_col_types = FALSE)
@@ -1453,7 +1457,6 @@ duplicate_entries <- duplicates_2024 %>%
 
 # Save duplicate entries before cleaning
 write_csv(duplicate_entries, duplicate_entries_file)
-
 message("📌 Duplicate entries for 2024 saved in `duplicate_entries_2024.csv`.")
 
 # Step 2: Remove complete duplicate rows only for 2024
@@ -1465,10 +1468,25 @@ group_roster_other <- group_roster %>% filter(ryear != 2024)
 # Combine cleaned 2024 data with other years
 group_roster_final <- bind_rows(group_roster_2024_cleaned, group_roster_other)
 
-# Save cleaned dataset as a new version
-write_csv(group_roster_final, group_roster_v2_file)
+# Step 3: Remove specific rows based on `index` values from `del_group_roster_37`
 
-message("✅ Removed all complete duplicates from `group_roster` for 2024 and saved as `analysis_ready_group_roster_v2.csv`.")
+# Load the Excel sheet containing indexes to be removed
+del_group_roster_37 <- read_excel(data_clean_file, sheet = "del_group_roster_37")
+
+# Ensure `index` column is numeric
+del_group_roster_37 <- del_group_roster_37 %>% mutate(index = as.numeric(index))
+
+# Remove rows from `group_roster_final` where `index` is in `del_group_roster_37`
+group_roster_final <- group_roster_final %>%
+  filter(!index %in% del_group_roster_37$index)
+
+message("🚀 Removed specific rows from `group_roster` based on `index` values from `del_group_roster_37`.")
+
+# Save cleaned dataset back to the same file (overwrite)
+write_csv(group_roster_final, group_roster_file)
+
+message("✅ Cleaned version of `group_roster` saved as `analysis_ready_group_roster.csv`.")
+
 # ======================================================
 # Step 38: Backup Analysis Ready Files with a Timestamp
 # ======================================================
