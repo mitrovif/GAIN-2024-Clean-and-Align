@@ -348,8 +348,8 @@ if (exists("group_roster_all") && exists("final_version_data") && "group_roster"
   merged_group <- bind_rows(renamed_group_roster, group_roster_all)
   
   # Ensure `index` exists before arranging
-  if ("index" %in% colnames(merged_group)) {
-    merged_group <- merged_group %>% arrange(index)
+  if ("X_index" %in% colnames(merged_group)) {
+    merged_group <- merged_group %>% arrange(X_index)
   } else {
     message("`index` column not found in merged_group. Skipping `arrange()`.")
   }
@@ -467,7 +467,6 @@ if (file.exists(analysis_ready_main_roster_file)) {
   stop("The file 'analysis_ready_main_roster.csv' does not exist in the specified directory.")
 }
 
-
 # Load the analysis-ready main roster file
 analysis_ready_main_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_main_roster.csv"
 
@@ -528,14 +527,17 @@ main_roster <- read.csv(analysis_ready_main_roster_file)
 main_roster <- main_roster %>%
   mutate(
     LOC01 = case_when(
-      LOC01 == "COUNTRY NSS/NSO/LINE MINISTRY" ~ 1, # Recode as 1
-      LOC01 == "INTERNATIONAL ORGANIZATION" ~ 2,    # Recode as 2
-      LOC01 == "CIVIL SOCIETY ORGANIZATION (CSO)" ~ 3, # Recode as 3
-      LOC01 == "1" ~ 1, # Keep 1 as is
-      LOC01 == "2" ~ 2, # Keep 2 as is
-      LOC01 == "3" ~ 3, # Keep 3 as is
-      TRUE ~ as.numeric(LOC01) # Keep existing numeric values if present
+      LOC01 == "COUNTRY NSS/NSO/LINE MINISTRY" ~ 1,    # Recode as 1
+      LOC01 == "INTERNATIONAL ORGANIZATION" ~ 2,        # Recode as 2
+      LOC01 == "CIVIL SOCIETY ORGANIZATION (CSO)" ~ 3,  # Recode as 3
+      LOC01 == "1" ~ 1,                                 # Keep "1" as is, converted to numeric
+      LOC01 == "2" ~ 2,                                 # Keep "2" as is, converted to numeric
+      LOC01 == "3" ~ 3,                                 # Keep "3" as is, converted to numeric
+      TRUE ~ NA_real_                                  # For everything else, convert to NA
     )
+  ) %>%
+  mutate(
+    LOC01 = as.numeric(LOC01)  # Ensure everything is numeric (NA values remain NA)
   )
 
 # Standardize `organization` text
@@ -563,11 +565,14 @@ main_roster <- read.csv(analysis_ready_main_roster_file)
 main_roster <- main_roster %>%
   mutate(
     LOC04 = case_when(
-      LOC04 == "01" | LOC04 == "1" | LOC04 == "NATIONAL" ~ 1,        # NATIONAL → 1
-      LOC04 == "02" | LOC04 == "2" | LOC04 == "SUB-NATIONAL" ~ 2,   # SUB-NATIONAL → 2
-      LOC04 == "06" | LOC04 == "6" | LOC04 == "OTHER" ~ 6,          # OTHER → 6
-      TRUE ~ as.numeric(LOC04)                                      # Keep existing numeric values
+      LOC04 == "01" | LOC04 == "1" | LOC04 == "NATIONAL" ~ 1,          # NATIONAL → 1
+      LOC04 == "02" | LOC04 == "2" | LOC04 == "SUB-NATIONAL" ~ 2,       # SUB-NATIONAL → 2
+      LOC04 == "06" | LOC04 == "6" | LOC04 == "OTHER" ~ 6,              # OTHER → 6
+      TRUE ~ NA_real_                                                    # For all other cases, convert to NA
     )
+  ) %>%
+  mutate(
+    LOC04 = as.numeric(LOC04)  # Ensure column is numeric
   )
 
 # Save the updated dataset under the same name
@@ -622,8 +627,11 @@ group_roster <- group_roster %>%
       PRO03B == "02" | PRO03B == "2" | PRO03B == "REGIONAL" ~ 2,          # REGIONAL → 2
       PRO03B == "03" | PRO03B == "3" | PRO03B == "COUNTRY" ~ 3,           # COUNTRY → 3
       PRO03B == "08" | PRO03B == "8" | PRO03B == "DON'T KNOW" ~ 8,        # DON'T KNOW → 8
-      TRUE ~ as.numeric(PRO03B)                                          # Keep numeric if already valid
-    )
+      TRUE ~ NA_real_                                                     # Keep numeric if already valid
+    ) 
+  ) %>%
+  mutate(
+    PRO03B = as.numeric(PRO03B)  # Ensure column is numeric
   )
 
 # Save the updated dataset under the same name
@@ -648,8 +656,11 @@ group_roster <- group_roster %>%
       PRO03D == "1" | PRO03D == "NATIONAL" ~ 1,             # NATIONAL → 1
       PRO03D == "2" | PRO03D == "INSTITUTIONAL" ~ 2,        # INSTITUTIONAL → 2
       PRO03D == "8" | PRO03D == "DON'T KNOW" ~ 8,           # DON'T KNOW → 8
-      TRUE ~ as.numeric(PRO03D)                            # Keep numeric if already valid
+      TRUE ~ NA_real_                            # Keep numeric if already valid
     )
+  ) %>%
+  mutate(
+    PRO03D = as.numeric(PRO03D)  # Ensure column is numeric
   )
 
 # Save the updated dataset under the same name
@@ -677,8 +688,11 @@ group_roster <- group_roster %>%
       PRO06 == "03" | PRO06 == "3" | PRO06 == "COMPLETED" | PRO06 == "ACHEVÉ" | PRO06 == "FINALIZADA" ~ 3,
       PRO06 == "06" | PRO06 == "6" | PRO06 == "OTHER" | PRO06 == "AUTRE" | PRO06 == "OTROS" ~ 6,
       PRO06 == "08" | PRO06 == "8" | PRO06 == "DON’T KNOW" | PRO06 == "NE SAIT PAS" | PRO06 == "NO SABE" ~ 8,
-      TRUE ~ as.numeric(PRO06) # Keep numeric values as is
+      TRUE ~ NA_real_ # Keep numeric values as is
     )
+  ) %>%
+  mutate(
+    PRO06 = as.numeric(PRO06)  # Ensure column is numeric
   )
 
 # Save the updated dataset under the same name
@@ -703,8 +717,11 @@ group_roster <- group_roster %>%
       PRO09 == "01" | PRO09 == "1" | PRO09 == "YES" | PRO09 == "OUI" | PRO09 == "SÍ" ~ 1,              # YES → 1
       PRO09 == "02" | PRO09 == "2" | PRO09 == "NO" | PRO09 == "NON" ~ 2,                              # NO → 2
       PRO09 == "08" | PRO09 == "8" | PRO09 == "DON'T KNOW" | PRO09 == "NE SAIT PAS" | PRO09 == "NO SABE" ~ 8, # DON'T KNOW → 8
-      TRUE ~ as.numeric(PRO09)                                                                       # Keep numeric values as is
-    )
+      TRUE ~ NA_real_                                                                       # Keep numeric values as is
+    ) 
+  ) %>%
+  mutate(
+    PRO09 = as.numeric(PRO09)  # Ensure column is numeric
   )
 
 # Save the updated dataset under the same name
@@ -728,8 +745,11 @@ group_roster <- group_roster %>%
     PRO14 = case_when(
       PRO14 == "01" | PRO14 == "1" | PRO14 == "YES" | PRO14 == "OUI" | PRO14 == "SÍ" ~ 1,  # YES → 1
       PRO14 == "02" | PRO14 == "2" | PRO14 == "NO" | PRO14 == "NON" ~ 2,                  # NO → 2
-      TRUE ~ as.numeric(PRO14)                                                           # Keep numeric values as is
+      TRUE ~ NA_real_                                                            # Keep numeric values as is
     )
+  ) %>%
+  mutate(
+    PRO14 = as.numeric(PRO14)  # Ensure column is numeric
   )
 
 # Save the updated dataset under the same name
@@ -753,8 +773,11 @@ group_roster <- group_roster %>%
     PRO15 = case_when(
       PRO15 == "01" | PRO15 == "1" | PRO15 == "YES" | PRO15 == "OUI" | PRO15 == "SÍ" ~ 1,  # YES → 1
       PRO15 == "02" | PRO15 == "2" | PRO15 == "NO" | PRO15 == "NON" ~ 2,                  # NO → 2
-      TRUE ~ as.numeric(PRO15)                                                           # Keep numeric values as is
-    )
+      TRUE ~ NA_real_                                                           # Keep numeric values as is
+    ) 
+  ) %>%
+  mutate(
+    PRO15 = as.numeric(PRO15)  # Ensure column is numeric
   )
 
 # Save the updated dataset under the same name
@@ -778,8 +801,11 @@ group_roster <- group_roster %>%
     PRO17 = case_when(
       PRO17 == "01" | PRO17 == "1" | PRO17 == "YES" | PRO17 == "OUI" | PRO17 == "SÍ" ~ 1,  # YES → 1
       PRO17 == "02" | PRO17 == "2" | PRO17 == "NO" | PRO17 == "NON" ~ 2,                  # NO → 2
-      TRUE ~ as.numeric(PRO17)                                                           # Keep numeric values as is
+      TRUE ~ NA_real_                                                           # Keep numeric values as is
     )
+  ) %>%
+  mutate(
+    PRO17 = as.numeric(PRO17)  # Ensure column is numeric
   )
 
 # Save the updated dataset under the same name
@@ -1090,6 +1116,9 @@ country_region_mapping <- tibble::tribble(
   "Honduras", "North America",
   "Marshall Islands", "Oceania"
 )
+
+country_region_mapping <- country_region_mapping %>%
+  unique()
 
 # Ensure `region` column exists in `group_roster` before updating
 if (!"region" %in% colnames(group_roster)) {
@@ -1472,11 +1501,11 @@ library(readr)
 library(readxl)
 
 # File paths
-group_roster_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
-duplicate_entries_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/duplicate_entries_2024.csv"
+group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+duplicate_entries_file <- "10 Data/Analysis Ready Files/duplicate_entries_2024.csv"
 
 # File path for the data cleaning Excel file
-data_clean_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/06 Data Cleaning/EGRISS_GAIN_2024_-_Data Clean.xlsx"
+data_clean_file <- "06 Data Cleaning/EGRISS_GAIN_2024_-_Data Clean.xlsx"
 
 # Load dataset
 group_roster <- read_csv(group_roster_file, show_col_types = FALSE)
@@ -1537,7 +1566,7 @@ library(lubridate)  # For timestamp generation
 library(stringr)  # For string manipulation
 
 # Define the base directory for analysis-ready files
-analysis_ready_directory <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files"
+analysis_ready_directory <- "10 Data/Analysis Ready Files"
 
 # Define the backup folder with timestamp
 timestamp <- format(Sys.time(), "%Y-%m-%d_%H-%M-%S")  # Generate timestamp
