@@ -1112,9 +1112,9 @@ country_region_mapping <- tibble::tribble(
   "Zimbabwe", "Africa",
   "Mozambique", "Africa",
   "Malawi", "Africa",
-  "Azerbaijan", "Asia",
-  "Honduras", "North America",
-  "Marshall Islands", "Oceania"
+  # "Azerbaijan", "Asia",
+  # "Honduras", "North America",
+  # "Marshall Islands", "Oceania"
 )
 
 country_region_mapping <- country_region_mapping %>%
@@ -1587,4 +1587,3 @@ file_copy(analysis_files, backup_directory, overwrite = TRUE)
 backup_files <- dir_ls(backup_directory, type = "file")
 message("📂 Backup Completed. Files in the backup folder:")
 print(backup_files)
--
