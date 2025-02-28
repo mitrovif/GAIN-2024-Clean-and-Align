@@ -8,7 +8,7 @@ library(readr)
 # Step 0: Define file locations
 # ======================================================
 
-setwd("C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024")
+setwd("C:/Users/mitro/UNHCR/EGRISS Secretariat - Documents/905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024")
 
 final_version_file <- "05 Data Collection/Data Archive/Final Version/EGRISS_GAIN_2024_Final_Version.xlsx"
 data_clean_file <- "06 Data Cleaning/EGRISS_GAIN_2024_-_Data Clean.xlsx"
@@ -1348,59 +1348,37 @@ final_version_data[["group_roster"]] <- group_roster
 # ======================================================
 # Step 34: Write and Clean PR012 roster for challenges and use of reccomendations
 # ======================================================
-
-# Load required libraries
 library(dplyr)
-library(readr)
-library(stringr)
-
-# File paths
-group_roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
-repeat_file <- "05 Data Collection/Data Archive/Final Version/repeat_PRO11_PRO12.csv"
-output_file <- "10 Data/Analysis Ready Files/analysis_ready_repeat_PRO11_PRO12.csv"
 
 # Load datasets
-group_roster <- read_csv(group_roster_file, show_col_types = FALSE)
-repeat_data <- read_csv(repeat_file, show_col_types = FALSE)
+group_roster <- read_csv("10 Data/Analysis Ready Files/analysis_ready_group_roster.csv", show_col_types = FALSE)
+repeat_data <- read_csv("05 Data Collection/Data Archive/Final Version/repeat_PRO11_PRO12.csv", show_col_types = FALSE)
 
 # Ensure `_parent_index` is numeric in `repeat_data`
 repeat_data <- repeat_data %>%
   mutate(across(c(`_parent_index`), as.numeric))
 
-# Join datasets to add additional columns from `group_roster`
+# Map values from group_roster without duplicating rows in repeat_data
 repeat_data <- repeat_data %>%
-  left_join(
-    group_roster %>%
-      select(index, morganization, mcountry, gPRO04, gPRO05, gLOC01, g_conled, region),
-    by = c("_parent_index" = "index")
+  mutate(
+    morganization = group_roster$morganization[match(`_parent_index`, group_roster$index)],
+    mcountry = group_roster$mcountry[match(`_parent_index`, group_roster$index)],
+    gPRO04 = group_roster$gPRO04[match(`_parent_index`, group_roster$index)],
+    gPRO05 = group_roster$gPRO05[match(`_parent_index`, group_roster$index)],
+    gLOC01 = group_roster$gLOC01[match(`_parent_index`, group_roster$index)],
+    g_conled = group_roster$g_conled[match(`_parent_index`, group_roster$index)],
+    region = group_roster$region[match(`_parent_index`, group_roster$index)]
   )
 
-# Convert `PRO12` variables to numeric (0, 1, NA)
-pro12_columns <- grep("^PRO12", names(repeat_data), value = TRUE)
-repeat_data <- repeat_data %>%
-  mutate(across(all_of(pro12_columns), ~ as.numeric(.)))
+# Save the cleaned dataset
+write_csv(repeat_data, "10 Data/Analysis Ready Files/analysis_ready_repeat_PRO11_PRO12.csv")
 
-# Rename `PRO12` columns
-new_pro12_names <- c("PRO12", paste0("PRO12", LETTERS[1:(length(pro12_columns) - 1)]))
-names(repeat_data)[which(names(repeat_data) %in% pro12_columns)] <- new_pro12_names
+# Confirm success
+message("Updated repeat_data saved successfully!")
 
-# Create a dictionary for labels using the uppercase text in the original names
-pro12_labels <- setNames(
-  str_extract(pro12_columns, "[A-Z\\s]+$"),
-  new_pro12_names
-)
-
-# Save the cleaned and updated dataset in the Analysis Ready Files folder
-write_csv(repeat_data, output_file)
-
-# Print labels for reference
-print(pro12_labels)
-
-# Confirm the file has been saved
-message("Updated file saved to: ", output_file)
 
 # ======================================================
-# Step 35: Write and Clean GRF repeat pledge file
+# Step 35: Write and Clean GRF Repeat Pledge File (Without Increasing Rows)
 # ======================================================
 
 # Load necessary libraries
@@ -1414,17 +1392,25 @@ main_roster_path <- "10 Data/Analysis Ready Files/analysis_ready_main_roster.csv
 output_path <- "10 Data/Analysis Ready Files/repeat_pledges_cleaned.csv"
 
 # Load datasets
-repeat_pledges <- read_csv(repeat_pledges_path)
-main_roster <- read_csv(main_roster_path)
+repeat_pledges <- read_csv(repeat_pledges_path, show_col_types = FALSE)
+main_roster <- read_csv(main_roster_path, show_col_types = FALSE)
 
-# Merge repeat_pledges with main_roster to add mcountry, morganization, and LOC01
+# Ensure `_parent_index` is numeric
+repeat_pledges <- repeat_pledges %>%
+  mutate(across(c(`_parent_index`), as.numeric))
+
+# Map values from `main_roster` without increasing rows in `repeat_pledges`
 repeat_pledges_cleaned <- repeat_pledges %>%
-  left_join(main_roster %>% select(index, mcountry, morganization, LOC01), 
-            by = c("_parent_index" = "index"))
+  mutate(
+    mcountry = main_roster$mcountry[match(`_parent_index`, main_roster$index)],
+    morganization = main_roster$morganization[match(`_parent_index`, main_roster$index)],
+    LOC01 = main_roster$LOC01[match(`_parent_index`, main_roster$index)]
+  )
 
-# Rename column
-colnames(repeat_pledges_cleaned)[colnames(repeat_pledges_cleaned) == 
-                                   "GRF04. What is the current status of the pledge implementation for pledge: **${pledge_name}?**"] <- "GRF04"
+# Rename column for pledge status
+colnames(repeat_pledges_cleaned)[
+  colnames(repeat_pledges_cleaned) == "GRF04. What is the current status of the pledge implementation for pledge: **${pledge_name}?**"
+] <- "GRF04"
 
 # Save cleaned dataset as CSV
 write_csv(repeat_pledges_cleaned, output_path)
