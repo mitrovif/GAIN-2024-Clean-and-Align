@@ -1344,11 +1344,12 @@ message("✅ Updated `group_roster` has been saved to: ", analysis_ready_file)
 
 # Save updated version of "group_roster" back to the list
 final_version_data[["group_roster"]] <- group_roster
+library(dplyr)
+library(readr)
 
 # ======================================================
-# Step 34: Write and Clean PR012 roster for challenges and use of reccomendations
+# Step 34: Write and Clean PRO12 roster for challenges and use of recommendations
 # ======================================================
-library(dplyr)
 
 # Load datasets
 group_roster <- read_csv("10 Data/Analysis Ready Files/analysis_ready_group_roster.csv", show_col_types = FALSE)
@@ -1370,11 +1371,113 @@ repeat_data <- repeat_data %>%
     region = group_roster$region[match(`_parent_index`, group_roster$index)]
   )
 
+library(dplyr)
+library(readr)
+
+# ======================================================
+# Step 34: Write and Clean PRO12 roster for challenges and use of recommendations
+# ======================================================
+
+# Load datasets
+group_roster <- read_csv("10 Data/Analysis Ready Files/analysis_ready_group_roster.csv", show_col_types = FALSE)
+repeat_data <- read_csv("05 Data Collection/Data Archive/Final Version/repeat_PRO11_PRO12.csv", show_col_types = FALSE)
+
+# Ensure `_parent_index` is numeric in `repeat_data`
+repeat_data <- repeat_data %>%
+  mutate(across(c(`_parent_index`), as.numeric))
+
+# Map values from group_roster without duplicating rows in repeat_data
+repeat_data <- repeat_data %>%
+  mutate(
+    morganization = group_roster$morganization[match(`_parent_index`, group_roster$index)],
+    mcountry = group_roster$mcountry[match(`_parent_index`, group_roster$index)],
+    gPRO04 = group_roster$gPRO04[match(`_parent_index`, group_roster$index)],
+    gPRO05 = group_roster$gPRO05[match(`_parent_index`, group_roster$index)],
+    gLOC01 = group_roster$gLOC01[match(`_parent_index`, group_roster$index)],
+    g_conled = group_roster$g_conled[match(`_parent_index`, group_roster$index)],
+    region = group_roster$region[match(`_parent_index`, group_roster$index)]
+  )
+
+library(dplyr)
+library(readr)
+
+# ======================================================
+# Step 34: Write and Clean PRO12 roster for challenges and use of recommendations
+# ======================================================
+
+# Load datasets
+group_roster <- read_csv("10 Data/Analysis Ready Files/analysis_ready_group_roster.csv", show_col_types = FALSE)
+repeat_data <- read_csv("05 Data Collection/Data Archive/Final Version/repeat_PRO11_PRO12.csv", show_col_types = FALSE)
+
+# Ensure `_parent_index` is numeric in `repeat_data`
+repeat_data <- repeat_data %>%
+  mutate(across(c(`_parent_index`), as.numeric))
+
+# Map values from group_roster without duplicating rows in repeat_data
+repeat_data <- repeat_data %>%
+  mutate(
+    morganization = group_roster$morganization[match(`_parent_index`, group_roster$index)],
+    mcountry = group_roster$mcountry[match(`_parent_index`, group_roster$index)],
+    gPRO04 = group_roster$gPRO04[match(`_parent_index`, group_roster$index)],
+    gPRO05 = group_roster$gPRO05[match(`_parent_index`, group_roster$index)],
+    gLOC01 = group_roster$gLOC01[match(`_parent_index`, group_roster$index)],
+    g_conled = group_roster$g_conled[match(`_parent_index`, group_roster$index)],
+    region = group_roster$region[match(`_parent_index`, group_roster$index)]
+  )
+
+# ======================================================
+# Rename PRO12 variables systematically
+# ======================================================
+
+# Identify PRO12 columns (ensure they contain "PRO12" somewhere)
+pro12_columns <- grep("PRO12", names(repeat_data), value = TRUE)
+
+# Define standard labels starting with "PRO12" and then "PRO12A" to "PRO12I"
+standard_labels <- c("PRO12", "PRO12A", "PRO12B", "PRO12C", "PRO12D", 
+                     "PRO12E", "PRO12F", "PRO12G", "PRO12H", "PRO12I")
+
+# Assign names in sequence
+if (length(pro12_columns) >= 10) {
+  main_pro12_names <- setNames(pro12_columns[1:10], standard_labels)
+} else {
+  main_pro12_names <- setNames(pro12_columns, standard_labels[seq_along(pro12_columns)])
+}
+
+# Identify the "Other (Specify)" and "Don't Know" columns
+pro12_other <- grep("OTHER|SPECIFY", pro12_columns, value = TRUE, ignore.case = TRUE)
+pro12_dont_know <- grep("DON.TKNOW|DONâ€™TKNOW|DONTKNOW", pro12_columns, value = TRUE, ignore.case = TRUE)
+
+# Assign PRO12X for "Other (Specify)" and PRO12Z for "Don't Know"
+if (length(pro12_other) > 0) {
+  main_pro12_names["PRO12X"] <- pro12_other[1]
+}
+if (length(pro12_dont_know) > 0) {
+  main_pro12_names["PRO12Z"] <- pro12_dont_know[1]
+}
+
+# Rename columns in repeat_data
+names(repeat_data)[match(unlist(main_pro12_names), names(repeat_data))] <- names(main_pro12_names)
+
+# ======================================================
+# Convert PRO12 variables to numeric
+# ======================================================
+pro12_numeric_vars <- c("PRO12", "PRO12A", "PRO12B", "PRO12C", "PRO12D", 
+                        "PRO12E", "PRO12F", "PRO12G", "PRO12H", "PRO12I",
+                        "PRO12X", "PRO12Z")
+
+# Ensure these columns exist in the dataset before converting
+existing_pro12_vars <- intersect(pro12_numeric_vars, names(repeat_data))
+
+repeat_data <- repeat_data %>%
+  mutate(across(all_of(existing_pro12_vars), as.numeric))
+
 # Save the cleaned dataset
 write_csv(repeat_data, "10 Data/Analysis Ready Files/analysis_ready_repeat_PRO11_PRO12.csv")
 
 # Confirm success
-message("Updated repeat_data saved successfully!")
+message("Updated repeat_data saved successfully with properly renamed PRO12 variables as numeric!")
+
+
 
 
 # ======================================================
