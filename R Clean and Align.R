@@ -1655,16 +1655,22 @@ roster_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
 # Load dataset
 roster_data <- read_csv(roster_file)
 
-# Apply recoding for cases where ryear == 2024 and mcountry == Norway
+# Apply recoding ONLY where:
+# - ryear == 2024
+# - mcountry == "Norway"
+# - PRO09 or PRO10.A is exactly 2 (no other values are changed)
 roster_data <- roster_data %>%
-  mutate(PRO09 = ifelse(ryear == 2024 & mcountry == "Norway", 1, PRO09),
-         PRO10A = ifelse(ryear == 2024 & mcountry == "Norway", 1, PRO10.A))
+  mutate(
+    PRO09 = ifelse(ryear == 2024 & mcountry == "Norway" & PRO09 == 2, 1, PRO09),
+    `PRO10.A` = ifelse(ryear == 2024 & mcountry == "Norway" & `PRO10.A` == 2, 1, `PRO10.A`)
+  )
 
 # Save the updated dataset
 write_csv(roster_data, roster_file)
 
 # Print success message
-cat("Recode applied to 'analysis_ready_group_roster.csv' for Norway (2024) and saved.\n")
+cat("Recode applied to 'analysis_ready_group_roster.csv' ONLY for Norway (2024) where values were 2, and saved.\n")
+
 # ======================================================
 # Step 39: Backup Analysis Ready Files with a Timestamp
 # ======================================================
