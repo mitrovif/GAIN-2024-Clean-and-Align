@@ -248,6 +248,7 @@ if ("_index" %in% colnames(main_roster)) {
 # ======================================================
 # Step 10: Merge `main_roster` with `renamed_EGRISS_GAIN_2024`
 # ======================================================
+renamed_EGRISS_GAIN_2024 <- read.csv(file.path(output_directory, "renamed_EGRISS_GAIN_2024.csv"))
 
 align_column_types <- function(df1, df2) {
   # Get the column names for both dataframes
@@ -1673,6 +1674,178 @@ cat("Recode applied to 'analysis_ready_group_roster.csv' ONLY for Norway (2024) 
 
 # ======================================================
 # Step 39: Backup Analysis Ready Files with a Timestamp
+# ======================================================
+# Load necessary libraries
+library(readxl)
+library(dplyr)
+
+# File paths
+pledge_data_path <- "10 Data/GRF Files External and Internal/Statistical_Inclusion_Pledge_Data.xlsx"
+repeat_pledges_path <- "10 Data/Analysis Ready Files/repeat_pledges_cleaned.csv"
+
+# Read the data files
+stat_pledges <- read_excel(pledge_data_path, sheet = "Statistical Inclusion Pledges") %>%
+  mutate(pledge_id = as.character(`Pledge ID`))
+pledge_updates <- read_excel(pledge_data_path, sheet = "Pledge Updates 2024") %>%
+  mutate(pledge_id = as.character(`Pledge ID`))
+repeat_pledges <- read.csv(repeat_pledges_path, stringsAsFactors = FALSE) %>%
+  mutate(Pledge.ID = gsub("GRF_", "GRF-", pledge_name),
+         pledge_id = as.character(Pledge.ID))
+
+# Add GRF04 values to datasets
+pledge_updates <- pledge_updates %>%
+  mutate(GRF04 = case_when(
+    `Implementation Stage2` == "Fulfilled" ~ "COMPLETED",
+    `Implementation Stage2` == "Planning stage" ~ "DESIGN/PLANNING",
+    `Implementation Stage2` == "In progress" ~ "IMPLEMENTATION",
+    TRUE ~ NA_character_
+  ))
+
+repeat_pledges <- repeat_pledges %>%
+  mutate(`Implementation Stage2` = case_when(
+    GRF04 == "COMPLETED" ~ "Fulfilled",
+    GRF04 == "DESIGN/PLANNING" ~ "Planning stage",
+    GRF04 == "IMPLEMENTATION" ~ "In progress",
+    TRUE ~ NA_character_
+  ))
+
+# Merge updates with Statistical Inclusion Pledges
+pledge_updates_clean <- pledge_updates %>%
+  select(pledge_id, GRF04, `Implementation Stage2`) %>%
+  rename(GRF04_updates = GRF04, Implementation_Stage2_updates = `Implementation Stage2`)
+
+repeat_pledges_clean <- repeat_pledges %>%
+  select(pledge_id, GRF04, `Implementation Stage2`) %>%
+  rename(GRF04_repeat = GRF04, Implementation_Stage2_repeat = `Implementation Stage2`)
+
+stat_pledges <- stat_pledges %>%
+  left_join(pledge_updates_clean, by = "pledge_id") %>%
+  left_join(repeat_pledges_clean, by = "pledge_id") %>%
+  mutate(
+    prog_gain = coalesce(GRF04_repeat, GRF04_updates, "OTHER"),
+    prog_gcr = case_when(
+      GRF04_repeat == "OTHER" ~ "Other",
+      !is.na(Implementation_Stage2_repeat) ~ Implementation_Stage2_repeat,
+      !is.na(Implementation_Stage2_updates) ~ Implementation_Stage2_updates,
+      TRUE ~ NA_character_
+    )
+  )
+
+# Country-region mapping
+df_country_region <- tibble::tribble(
+  ~mcountry, ~region,
+  "Armenia", "Asia",
+  "Azerbaijan", "Asia",
+  "Belarus", "Europe",
+  "Belgium", "Europe",
+  "Burkina Faso", "Africa",
+  "Côte d’Ivoire", "Africa",
+  "Cambodia", "Asia",
+  "Cameroon", "Africa",
+  "Canada", "North America",
+  "Central African Republic", "Africa",
+  "Chad", "Africa",
+  "Chile", "South America",
+  "Colombia", "South America",
+  "Congo - Kinshasa", "Africa",
+  "Democratic Republic of the Congo", "Africa",
+  "Djibouti", "Africa",
+  "Egypt", "Africa",
+  "El Salvador", "North America",
+  "Estonia", "Europe",
+  "Ethiopia", "Africa",
+  "Finland", "Europe",
+  "France", "Europe",
+  "Georgia", "Europe",
+  "Germany", "Europe",
+  "Ghana", "Africa",
+  "Greece", "Europe",
+  "Honduras", "North America",
+  "Hungary", "Europe",
+  "Indonesia", "Asia",
+  "Iraq", "Middle East",
+  "Italy", "Europe",
+  "Jordan", "Middle East",
+  "Kazakhstan", "Asia",
+  "Kenya", "Africa",
+  "Kyrgyzstan", "Asia",
+  "Laos", "Asia",
+  "Lebanon", "Middle East",
+  "Liechtenstein", "Europe",
+  "Mali", "Africa",
+  "Marshall Islands", "Oceania",
+  "Mauritania", "Africa",
+  "Mexico", "North America",
+  "Moldova", "Europe",
+  "Morocco", "Africa",
+  "Netherlands", "Europe",
+  "Nigeria", "Africa",
+  "Norway", "Europe",
+  "Palestinian Territories", "Middle East",
+  "Panama", "North America",
+  "Peru", "South America",
+  "Philippines", "Asia",
+  "Poland", "Europe",
+  "Republic of Moldova", "Europe",
+  "Rwanda", "Africa",
+  "Slovenia", "Europe",
+  "Somalia", "Africa",
+  "South Africa", "Africa",
+  "South Sudan", "Africa",
+  "Spain", "Europe",
+  "Sri Lanka", "Asia",
+  "State of Palestine", "Middle East",
+  "Sudan", "Africa",
+  "Sweden", "Europe",
+  "Switzerland", "Europe",
+  "Thailand", "Asia",
+  "Turkey", "Asia",
+  "Turkmenistan", "Asia",
+  "Uganda", "Africa",
+  "Ukraine", "Europe",
+  "United Kingdom", "Europe",
+  "United States", "North America",
+  "Yemen", "Middle East",
+  "Zambia", "Africa",
+  "Burundi", "Africa",
+  "Bangladesh", "Asia",
+  "Zimbabwe", "Africa",
+  "Mozambique", "Africa",
+  "Malawi", "Africa",
+  "Kosovo*", "Europe",
+  "Guinea-Bissau", "Africa",
+  "United States of America", "North America",
+  "Gambia", "Africa",
+  "Nepal", "Asia",
+  "Costa Rica", "North America",
+  "Belize", "North America",
+  "Niger", "Africa",
+  "Denmark", "Europe",
+  "The Philippines", "Asia",
+  "Australia", "Oceania",
+  "The United States of America", "North America",
+  "Democratic Republic of The Congo", "Africa",
+  "Brazil", "South America",
+  "New Zealand", "Oceania",
+  "Angola", "Africa",
+  "Bulgaria", "Europe",
+  "Eswatini", "Africa")
+# Add region variable to dataset
+stat_pledges <- stat_pledges %>%
+  left_join(df_country_region, by = c("Country - Submitting Entity" = "mcountry"))
+# Output directory
+output_dir <- "10 Data/Analysis Ready Files"
+if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
+
+# Save updated files
+write.csv(stat_pledges, file.path(output_dir, "Statistical_Inclusion_Pledges_Updated.csv"), row.names = FALSE)
+write.csv(pledge_updates, file.path(output_dir, "Pledge_Updates_2024.csv"), row.names = FALSE)
+write.csv(repeat_pledges, file.path(output_dir, "repeat_pledges_cleaned.csv"), row.names = FALSE)
+
+
+
+# ======================================================
+# Step 40: Backup Analysis Ready Files with a Timestamp
 # ======================================================
 
 # Load necessary libraries
